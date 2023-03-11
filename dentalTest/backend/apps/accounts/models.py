@@ -1,5 +1,6 @@
+from django.core.validators import MaxValueValidator
 from django.db import models
-from django.contrib.auth.models import AbstractUser
+from django.contrib.auth.models import AbstractUser, Permission, Group
 from django.contrib.auth.base_user import BaseUserManager
 # Create your models here.
 class UserManager(BaseUserManager):
@@ -28,7 +29,7 @@ class User(AbstractUser):
         name = models.CharField("Имя", max_length=20)
         last_name = models.CharField('Фамилия', max_length=20)
         email = models.EmailField("Email", unique=True)
-        age = models.IntegerField('Возраст', max_length=3)
+        age = models.IntegerField('Возраст',validators=[MaxValueValidator(100)] )
         avatar = models.ImageField("Фото", upload_to="user_images/", null=True, blank=True)
         created = models.DateTimeField("Дата создания", auto_now_add=True)
         phone = models.CharField(
@@ -37,6 +38,24 @@ class User(AbstractUser):
             max_length=10,
             unique = True
         )
+
+        user_permissions = models.ManyToManyField(
+            Permission,
+            related_name='user_permissions',
+            blank=True,
+        )
+
+        groups = models.ManyToManyField(
+            Group,
+            verbose_name= ('groups'),
+            blank=True,
+            help_text= (
+                'The groups this user belongs to. A user will get all permissions '
+                'granted to each of their groups.'
+            ),
+            related_name='user_groups',
+            related_query_name='user',)
+
         USERNAME_FIELD = 'phone'
         REQUIRED_FIELDS = []
 
@@ -55,7 +74,25 @@ class Doctor(AbstractUser):
         max_length=10,
         unique=True
     )
+    user_permissions = models.ManyToManyField(
+        Permission,
+        related_name='doctor_permissions',
+        blank=True,
+    )
+
+    groups = models.ManyToManyField(
+        Group,
+        verbose_name=('groups'),
+        blank=True,
+        help_text=(
+            'The groups this user belongs to. A user will get all permissions '
+            'granted to each of their groups.'
+        ),
+        related_name='doctor_groups',
+        related_query_name='doctor',)
+
     is_superuser = True
     is_active = True
+
 
     objects = UserManager()
