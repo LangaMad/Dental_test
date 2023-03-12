@@ -29,14 +29,14 @@ class User(AbstractUser):
         name = models.CharField("Имя", max_length=20)
         last_name = models.CharField('Фамилия', max_length=20)
         email = models.EmailField("Email", unique=True)
-        age = models.IntegerField('Возраст',validators=[MaxValueValidator(100)] )
+        age = models.IntegerField('Возраст',validators=[MaxValueValidator(100)], null = True)
         avatar = models.ImageField("Фото", upload_to="user_images/", null=True, blank=True)
         created = models.DateTimeField("Дата создания", auto_now_add=True)
         phone = models.CharField(
             'Номер телефона',
             null=True,
             max_length=10,
-            unique = True
+
         )
 
         user_permissions = models.ManyToManyField(
@@ -56,8 +56,7 @@ class User(AbstractUser):
             related_name='user_groups',
             related_query_name='user',)
 
-        USERNAME_FIELD = 'phone'
-        REQUIRED_FIELDS = []
+
 
         objects = UserManager()
 
@@ -72,7 +71,7 @@ class Doctor(AbstractUser):
         'Номер телефона',
         null=True,
         max_length=10,
-        unique=True
+
     )
     user_permissions = models.ManyToManyField(
         Permission,
